@@ -1,16 +1,15 @@
 import asyncio
 from llama_index.core.agent.workflow import FunctionAgent
+from llama_index.llms.azure_openai import AzureOpenAI
 import os
-from openai import AzureOpenAI
-
-
 
 subscription_key = os.getenv("AZURE_OPENAI_KEY")
 
-client = AzureOpenAI(
+llms = AzureOpenAI(
     api_version="2024-12-01-preview",
-    azure_endpoint="https://gaurav-testing.openai.azure.com/openai/v1/chat/completions",
+    azure_endpoint="https://gaurav-testing.openai.azure.com",
     api_key=subscription_key,
+    engine="gpt-5.2",
 )
 
 
@@ -23,7 +22,7 @@ def multiply(a: float, b: float) -> float:
 # Create an agent workflow with our calculator tool
 agent = FunctionAgent(
     tools=[multiply],
-    llm=client,
+    llm=llms,
     system_prompt="You are a helpful assistant that can multiply two numbers.",
 )
 
