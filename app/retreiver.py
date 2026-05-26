@@ -1,4 +1,5 @@
 import asyncio
+import requests
 import boto3
 from typing import List
 from llama_index.core.schema import TextNode, NodeWithScore
@@ -9,13 +10,15 @@ from llama_index.core.response_synthesizers import get_response_synthesizer
 from llama_index.embeddings.bedrock import BedrockEmbedding
 from llama_index.llms.bedrock_converse import BedrockConverse
 from llama_index.core.agent.workflow import FunctionAgent
+from llama_index.core.tools import FunctionTool
+
 
 # =========================================================
 # 1. BEDROCK LLM
 # =========================================================
 llm = BedrockConverse(
-    model="deepseek.v3.2",
-    region_name="ap-south-1",
+    model="us.anthropic.claude-sonnet-4-5-20250929-v1:0"
+    #region_name="ap-south-1",
 )
 
 # =========================================================
@@ -103,11 +106,69 @@ rag_tool = QueryEngineTool.from_defaults(
     )
 )
 
+# STOCK API ADDITION
+import requests
+from typing import Dict, Any
+
+BASE_URL = "https://stock.indianapi.in"
+
+HEADERS = {
+    "Accept": "application/json",
+    "x-api-key": "sk-live-5kjUZn5CKD1f1vPoUtQUDKb1pVy74QVDwqFjoRtp"
+}
+
+
+def call_stock_api(endpoint: str, params: dict = None):
+    url = f"{BASE_URL}/{endpoint}"
+
+    response = requests.get(
+        url,
+        headers=HEADERS,
+        params=params
+    )
+
+    response.raise_for_status()
+
+    return response.json()
+
+def get_stock_details(symbol: str):
+    return call_stock_api(
+        "stock",
+        params={"name": symbol}
+    )
+
+from llama_index.core.tools import FunctionTool
+
+def get_trending_stocks():
+    return call_stock_api("trending")
+
+
+trending_tool = FunctionTool.from_defaults(
+    fn=get_trending_stocks,
+    name="get_trending_stocks",
+    description="""
+    Get trending Indian stocks in the market.
+    Use when user asks:
+    - trending stocks
+    - hot stocks
+    - market movers
+    """
+)
+
+stock_tool = FunctionTool.from_defaults(
+    fn=get_stock_details,
+    name="get_stock_details",
+    description="""
+    Get detailed stock information.
+    Input should be NSE/BSE stock symbol.
+    """
+)
+
 # =========================================================
 # 8. CREATE AGENT
 # =========================================================
 agent = FunctionAgent(
-    tools=[rag_tool],
+    tools=[rag_tool, stock_tool],
     llm=llm,
     system_prompt=(
         "You are a financial research assistant."
