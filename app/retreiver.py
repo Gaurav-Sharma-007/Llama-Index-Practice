@@ -1,7 +1,7 @@
 import asyncio
 import requests
 import boto3
-from typing import List
+from typing import List,Dict,Any
 from llama_index.core.schema import TextNode, NodeWithScore
 from llama_index.core.retrievers import BaseRetriever
 from llama_index.core.query_engine import RetrieverQueryEngine
@@ -106,9 +106,7 @@ rag_tool = QueryEngineTool.from_defaults(
     )
 )
 
-# STOCK API ADDITION
-import requests
-from typing import Dict, Any
+# Base URL for the stock API. This will be used to construct the full endpoint URLs for different API calls. The API provides various endpoints to fetch stock details, trending stocks, and market news, which can be accessed by appending the specific endpoint to this base URL.
 
 BASE_URL = "https://stock.indianapi.in"
 
@@ -131,17 +129,28 @@ def call_stock_api(endpoint: str, params: dict = None):
 
     return response.json()
 
+#Stock details API provides comprehensive information about a specific stock, including its current price, historical performance, financial ratios, and other relevant data. This can be useful for users who want to analyze a particular stock before making investment decisions. The tool can be invoked when users ask about specific stocks, their performance, or financial details.
+
 def get_stock_details(symbol: str):
     return call_stock_api(
         "stock",
         params={"name": symbol}
     )
 
-from llama_index.core.tools import FunctionTool
+
+stock_tool = FunctionTool.from_defaults(
+    fn=get_stock_details,
+    name="get_stock_details",
+    description="""
+    Get detailed stock information.
+    Input should be NSE/BSE stock symbol.
+    """
+)
 
 def get_trending_stocks():
     return call_stock_api("trending")
 
+#Trending stocks API provides a list of currently trending Indian stocks in the market. This can be useful for users who want to stay updated on market movers and hot stocks. The tool can be invoked when users ask about trending stocks, hot stocks, or market movers.
 
 trending_tool = FunctionTool.from_defaults(
     fn=get_trending_stocks,
@@ -155,20 +164,22 @@ trending_tool = FunctionTool.from_defaults(
     """
 )
 
-stock_tool = FunctionTool.from_defaults(
-    fn=get_stock_details,
-    name="get_stock_details",
-    description="""
-    Get detailed stock information.
-    Input should be NSE/BSE stock symbol.
-    """
+def get_market_news():
+    return call_stock_api("news")
+
+
+news_tool = FunctionTool.from_defaults(
+    fn=get_market_news,
+    name="get_market_news",
+    description="Get latest Indian stock market news."
 )
+
 
 # =========================================================
 # 8. CREATE AGENT
 # =========================================================
 agent = FunctionAgent(
-    tools=[rag_tool, stock_tool],
+    tools=[rag_tool, stock_tool,trending_tool],
     llm=llm,
     system_prompt=(
         "You are a financial research assistant."
