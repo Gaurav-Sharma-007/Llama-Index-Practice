@@ -179,7 +179,7 @@ news_tool = FunctionTool.from_defaults(
 # 8. CREATE AGENT
 # =========================================================
 agent = FunctionAgent(
-    tools=[rag_tool, stock_tool,trending_tool],
+    tools=[rag_tool, stock_tool,trending_tool,news_tool],
     llm=llm,
     system_prompt=(
         "You are a financial research assistant."
@@ -191,7 +191,7 @@ agent = FunctionAgent(
 # =========================================================
 async def main():
     response = await agent.run(
-        "What does the report say about investment strategies?"
+        "What does the report say about investment strategies, also I need to know what is the Tata Motors stock today ??"
     )
     print(response)
 
