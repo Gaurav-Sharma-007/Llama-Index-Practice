@@ -1,9 +1,10 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { MessageCirclePlus, PanelLeft, Search, Send, Sparkles } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import "./styles.css";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000/api/chat";
+const API_URL = import.meta.env.VITE_API_URL ?? "/api/chat";
 const WELCOME_MESSAGE = "Hi, How can I help you today ? ";
 
 function createChat(id) {
@@ -12,6 +13,14 @@ function createChat(id) {
     title: `Chat ${id}`,
     messages: [{ role: "assistant", content: WELCOME_MESSAGE }]
   };
+}
+
+function MessageContent({ message }) {
+  if (message.role === "assistant") {
+    return <ReactMarkdown>{message.content}</ReactMarkdown>;
+  }
+
+  return message.content;
 }
 
 function App() {
@@ -140,7 +149,9 @@ function App() {
           {activeChat.messages.map((message, index) => (
             <article className={`message ${message.role}`} key={`${message.role}-${index}`}>
               <div className="avatar">{message.role === "assistant" ? "AI" : "You"}</div>
-              <div className="bubble">{message.content}</div>
+              <div className="bubble">
+                <MessageContent message={message} />
+              </div>
             </article>
           ))}
           {isLoading && (

@@ -237,7 +237,68 @@ h1 {
   border: 1px solid rgba(148, 163, 184, 0.26);
   border-radius: 8px;
   box-shadow: 0 18px 38px rgba(15, 23, 42, 0.1);
-  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bubble > :first-child {
+  margin-top: 0;
+}
+
+.bubble > :last-child {
+  margin-bottom: 0;
+}
+
+.bubble h1,
+.bubble h2,
+.bubble h3 {
+  color: #111827;
+  letter-spacing: 0;
+  line-height: 1.22;
+}
+
+.bubble h1 {
+  margin: 0 0 14px;
+  font-size: 1.38rem;
+}
+
+.bubble h2 {
+  margin: 18px 0 10px;
+  font-size: 1.16rem;
+}
+
+.bubble h3 {
+  margin: 16px 0 8px;
+  font-size: 1rem;
+}
+
+.bubble p {
+  margin: 0 0 11px;
+}
+
+.bubble strong {
+  color: #0b625b;
+  font-weight: 800;
+}
+
+.bubble ul,
+.bubble ol {
+  margin: 8px 0 14px;
+  padding-left: 1.15rem;
+}
+
+.bubble li {
+  margin: 6px 0;
+}
+
+.bubble li::marker {
+  color: #0f766e;
+}
+
+.bubble hr {
+  height: 1px;
+  margin: 16px 0;
+  background: rgba(148, 163, 184, 0.34);
+  border: 0;
 }
 
 .message.user .bubble {
@@ -245,6 +306,11 @@ h1 {
   background: linear-gradient(135deg, #0f766e, #16443e);
   border-color: rgba(15, 118, 110, 0.2);
   box-shadow: 0 18px 38px rgba(15, 118, 110, 0.22);
+  white-space: pre-wrap;
+}
+
+.message.user .bubble strong {
+  color: #ffffff;
 }
 
 .typing {

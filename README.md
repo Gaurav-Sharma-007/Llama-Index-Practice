@@ -95,15 +95,17 @@ Open the local Vite URL, usually:
 http://localhost:5173
 ```
 
+During development, Vite proxies frontend requests from `/api/*` to `http://localhost:8000`. This avoids browser networking issues when you open the UI through `localhost`, `127.0.0.1`, or a local network URL.
+
 ## Configure API URL
 
-The frontend defaults to:
+The frontend defaults to the same-origin API path:
 
 ```text
-http://localhost:8000/api/chat
+/api/chat
 ```
 
-To point it elsewhere:
+To bypass the Vite proxy and point it elsewhere:
 
 ```bash
 cd frontend
